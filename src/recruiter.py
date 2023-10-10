@@ -240,6 +240,7 @@ if __name__ == "__main__":
     identity_file = args.identity_file
 
     if not os.path.exists(identity) and not os.path.exists(identity_file):
+        print(f"Attempted to use identity {identity_file} from path {identity}")
         print(f"Identity does not exist")
         sys.exit(1)
 

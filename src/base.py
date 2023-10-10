@@ -91,16 +91,33 @@ class Base:
                 ## replace the start and count params
                 url = url.replace("start=0", f"start={start}")
                 url = url.replace("count=25", f"count={count}")
-                
 
                 response = requests.get(url, cookies=self.cookies, headers=self.headers, timeout=10)
                 if response.status_code != 200:
-                    print(f"page: {page} - error {response.status_code} - {response.text}")
+                    ### printing more debug information this isn't enough
+                    response_headers = dict(response.headers)
+                    response_cookies = dict(response.cookies)
+
+                    print(f"Error getting leads: {response.status_code} - {response.text}\n")
+                    print(f"Content headers: {json.dumps(response_headers, indent=2)}\n")
+                    print(f"Content cookies: {json.dumps(response_cookies, indent=2)}\n")
+                    
+                    print("Request information: \n")
+                    print(f"URL: {url}\n")
+                    print(f"Headers: {json.dumps(self.headers, indent=2)}\n")
+                    print(f"Cookies: {json.dumps(self.cookies, indent=2)}\n")
+                    print(f"Occured on page: {page}")
+                    
                     break
                 content = response.json()
 
                 if "elements" in content:
+                    response_headers = dict(response.headers)
+                    response_cookies = dict(response.cookies)
                     leads_local.extend(content["elements"])
+                    print(f"Current status: {response.status_code} - {response.text}\n")
+                    print(f"Content headers: {json.dumps(response_headers, indent=2)}\n")
+                    print(f"Content cookies: {json.dumps(response_cookies, indent=2)}\n")
                     print(f'page: {page} - {len(content["elements"])} leads')
                 else:
                     print(f"page: {page} - no leads")
@@ -109,6 +126,11 @@ class Base:
                 time.sleep(random.randint(time_delay_min, time_delay_max))
             
             print(f"Total leads: {len(leads_local)}")
+            print("Request information: \n")
+            print(f"URL: {url}\n")
+            print(f"Headers: {json.dumps(self.headers, indent=2)}\n")
+            print(f"Cookies: {json.dumps(self.cookies, indent=2)}\n")
+
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(leads_local, f, indent=2)
 
